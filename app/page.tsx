@@ -4,6 +4,7 @@ import { CallToAction } from '../components/CallToAction';
 import { FeatureCard } from '../components/FeatureCard';
 import { Hero } from '../components/Hero';
 import { HowItWorks } from '../components/HowItWorks';
+import { InteractiveWorld } from '../components/InteractiveWorld';
 import { JourneyWizard } from '../components/JourneyWizard';
 import { Stats } from '../components/Stats';
 import { useJourney } from '../components/JourneyContext';
@@ -82,6 +83,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      <InteractiveWorld />
       <HowItWorks />
       <Stats />
       <CallToAction />

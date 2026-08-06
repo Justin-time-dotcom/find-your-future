@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { CountryCard } from './CountryCard';
 
 interface CountrySelectorProps {
   selectedCountry: string | null;
@@ -21,11 +22,44 @@ const countries = [
 
 export function CountrySelector({ selectedCountry, onSelect }: CountrySelectorProps) {
   const [query, setQuery] = useState('');
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
   const filteredCountries = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     if (!normalized) return countries;
     return countries.filter((country) => country.name.toLowerCase().includes(normalized));
   }, [query]);
+
+  useEffect(() => {
+    setHighlightedIndex(0);
+  }, [query]);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!filteredCountries.length) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setHighlightedIndex((current) => (current + 1) % filteredCountries.length);
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setHighlightedIndex((current) => (current - 1 + filteredCountries.length) % filteredCountries.length);
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const selected = filteredCountries[highlightedIndex];
+      if (selected) {
+        onSelect(selected.name);
+      }
+    }
+
+    if (event.key === 'Escape') {
+      setQuery('');
+      inputRef.current?.blur();
+    }
+  };
 
   return (
     <div className="space-y-5">
@@ -34,9 +68,11 @@ export function CountrySelector({ selectedCountry, onSelect }: CountrySelectorPr
           Search country
         </label>
         <input
+          ref={inputRef}
           id="country-search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Type a country name"
           className="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none ring-0 transition focus:border-cyan-400"
           aria-label="Search country"
@@ -44,29 +80,16 @@ export function CountrySelector({ selectedCountry, onSelect }: CountrySelectorPr
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        {filteredCountries.map((country) => {
+        {filteredCountries.map((country, index) => {
           const isActive = selectedCountry === country.name;
           return (
-            <motion.button
+            <CountryCard
               key={country.name}
-              type="button"
-              whileHover={{ y: -2, scale: 1.01 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => onSelect(country.name)}
-              className={`flex items-center justify-between rounded-2xl border px-4 py-4 text-left transition ${
-                isActive
-                  ? 'border-cyan-400/40 bg-cyan-400/10 text-white shadow-lg shadow-cyan-500/10'
-                  : 'border-white/10 bg-slate-900/60 text-slate-300 hover:border-white/20 hover:bg-slate-800/70'
-              }`}
-            >
-              <span className="flex items-center gap-3 text-sm font-medium">
-                <span className="text-lg">{country.flag}</span>
-                {country.name}
-              </span>
-              <span className="text-xs uppercase tracking-[0.2em] text-slate-400">
-                {country.educationSystems.length > 1 ? 'Multiple' : 'Single'}
-              </span>
-            </motion.button>
+              country={country}
+              isSelected={isActive}
+              isHighlighted={index === highlightedIndex}
+              onSelect={onSelect}
+            />
           );
         })}
       </div>

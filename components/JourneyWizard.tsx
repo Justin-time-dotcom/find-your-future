@@ -4,8 +4,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useMemo } from 'react';
 import { CountrySelector } from './CountrySelector';
 import { EducationSystemSelector } from './EducationSystemSelector';
-import { ProgressIndicator } from './ProgressIndicator';
+import { ProgressBar } from './ProgressBar';
 import { useJourney } from './JourneyContext';
+import { WizardNavigation } from './WizardNavigation';
 
 const stepContent = [
   {
@@ -66,9 +67,8 @@ export function JourneyWizard() {
           </button>
         </div>
 
-        <div className="mt-6 flex items-center justify-between">
-          <ProgressIndicator currentStep={currentStep} totalSteps={3} />
-          <p className="text-sm text-slate-400">Step {currentStep + 1} of 3</p>
+        <div className="mt-6">
+          <ProgressBar currentStep={currentStep} totalSteps={3} labels={['Country', 'Education System', 'Grades']} />
         </div>
 
         <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-slate-950/60 p-5">
@@ -120,32 +120,14 @@ export function JourneyWizard() {
           </AnimatePresence>
         </div>
 
-        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <button
-            type="button"
-            onClick={previousStep}
-            className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10"
-          >
-            Back
-          </button>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={closeWizard}
-              className="rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleContinue}
-              disabled={!canContinue}
-              className="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {currentStep === 2 ? 'Finish' : 'Continue'}
-            </button>
-          </div>
-        </div>
+        <WizardNavigation
+          currentStep={currentStep}
+          totalSteps={3}
+          onBack={currentStep === 0 ? closeWizard : previousStep}
+          onContinue={handleContinue}
+          onCancel={closeWizard}
+          canContinue={canContinue}
+        />
       </motion.div>
     </div>
   );

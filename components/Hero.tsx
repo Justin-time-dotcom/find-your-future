@@ -13,6 +13,7 @@ export function Hero() {
     <section id="hero" className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900/70 px-6 py-16 shadow-2xl shadow-slate-950/40 backdrop-blur-xl sm:px-8 lg:px-12 lg:py-20">
       <BackgroundEffects />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(37,99,235,0.28),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(20,184,166,0.2),_transparent_32%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.035)_0%,transparent_40%,rgba(255,255,255,0.025)_100%)]" />
       <div className="relative grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -34,7 +35,7 @@ export function Hero() {
               <button
                 type="button"
                 onClick={openWizard}
-                className="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-500"
+                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:shadow-cyan-500/20"
               >
                 Start Your Journey
               </button>
