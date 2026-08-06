@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { countries } from '../data/countries';
 import { CountryCard } from './CountryCard';
 
 interface CountrySelectorProps {
@@ -9,16 +9,7 @@ interface CountrySelectorProps {
   onSelect: (country: string | null) => void;
 }
 
-const countries = [
-  { name: 'Kenya', flag: '🇰🇪', educationSystems: ['KCSE'] },
-  { name: 'United Kingdom', flag: '🇬🇧', educationSystems: ['GCSE', 'A Levels'] },
-  { name: 'United States', flag: '🇺🇸', educationSystems: ['SAT', 'ACT'] },
-  { name: 'Canada', flag: '🇨🇦', educationSystems: ['Provincial Curriculum'] },
-  { name: 'India', flag: '🇮🇳', educationSystems: ['CBSE', 'ICSE'] },
-  { name: 'Nigeria', flag: '🇳🇬', educationSystems: ['WAEC'] },
-  { name: 'South Africa', flag: '🇿🇦', educationSystems: ['NSC'] },
-  { name: 'International', flag: '🌍', educationSystems: ['IB'] },
-];
+const countryOptions = countries.map((country) => ({ id: country.id, name: country.name, flag: country.flag ?? '🌍' }));
 
 export function CountrySelector({ selectedCountry, onSelect }: CountrySelectorProps) {
   const [query, setQuery] = useState('');
@@ -26,8 +17,8 @@ export function CountrySelector({ selectedCountry, onSelect }: CountrySelectorPr
   const inputRef = useRef<HTMLInputElement>(null);
   const filteredCountries = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    if (!normalized) return countries;
-    return countries.filter((country) => country.name.toLowerCase().includes(normalized));
+    if (!normalized) return countryOptions;
+    return countryOptions.filter((country) => country.name.toLowerCase().includes(normalized));
   }, [query]);
 
   useEffect(() => {
@@ -84,11 +75,11 @@ export function CountrySelector({ selectedCountry, onSelect }: CountrySelectorPr
           const isActive = selectedCountry === country.name;
           return (
             <CountryCard
-              key={country.name}
-              country={country}
-              isSelected={isActive}
+              key={country.id}
+              country={{ name: country.name, flag: country.flag, educationSystems: [] }}
+              isSelected={selectedCountry === country.id}
               isHighlighted={index === highlightedIndex}
-              onSelect={onSelect}
+              onSelect={() => onSelect(country.id)}
             />
           );
         })}

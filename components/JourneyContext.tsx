@@ -5,6 +5,10 @@ import { createContext, useContext, useMemo, useReducer, type ReactNode } from '
 type JourneyState = {
   selectedCountry: string | null;
   selectedEducationSystem: string | null;
+  otherEducationSystemName: string;
+  customGradingScale: string;
+  customSubjects: string[];
+  customGrades: Record<string, string>;
   isWizardOpen: boolean;
   currentStep: number;
   isComplete: boolean;
@@ -15,6 +19,10 @@ type JourneyContextValue = JourneyState & {
   closeWizard: () => void;
   setCountry: (country: string | null) => void;
   setEducationSystem: (system: string | null) => void;
+  setOtherEducationSystemName: (name: string) => void;
+  setCustomGradingScale: (scale: string) => void;
+  setCustomSubjects: (subjects: string[]) => void;
+  setCustomGrades: (grades: Record<string, string>) => void;
   nextStep: () => void;
   previousStep: () => void;
   resetJourney: () => void;
@@ -26,6 +34,10 @@ type JourneyAction =
   | { type: 'CLOSE_WIZARD' }
   | { type: 'SET_COUNTRY'; payload: string | null }
   | { type: 'SET_EDUCATION_SYSTEM'; payload: string | null }
+  | { type: 'SET_OTHER_EDUCATION_SYSTEM_NAME'; payload: string }
+  | { type: 'SET_CUSTOM_GRADING_SCALE'; payload: string }
+  | { type: 'SET_CUSTOM_SUBJECTS'; payload: string[] }
+  | { type: 'SET_CUSTOM_GRADES'; payload: Record<string, string> }
   | { type: 'NEXT_STEP' }
   | { type: 'PREVIOUS_STEP' }
   | { type: 'RESET_JOURNEY' }
@@ -34,6 +46,10 @@ type JourneyAction =
 const initialState: JourneyState = {
   selectedCountry: null,
   selectedEducationSystem: null,
+  otherEducationSystemName: '',
+  customGradingScale: '',
+  customSubjects: [],
+  customGrades: {},
   isWizardOpen: false,
   currentStep: 0,
   isComplete: false,
@@ -49,6 +65,14 @@ function journeyReducer(state: JourneyState, action: JourneyAction): JourneyStat
       return { ...state, selectedCountry: action.payload, selectedEducationSystem: null };
     case 'SET_EDUCATION_SYSTEM':
       return { ...state, selectedEducationSystem: action.payload };
+    case 'SET_OTHER_EDUCATION_SYSTEM_NAME':
+      return { ...state, otherEducationSystemName: action.payload };
+    case 'SET_CUSTOM_GRADING_SCALE':
+      return { ...state, customGradingScale: action.payload };
+    case 'SET_CUSTOM_SUBJECTS':
+      return { ...state, customSubjects: action.payload };
+    case 'SET_CUSTOM_GRADES':
+      return { ...state, customGrades: action.payload };
     case 'NEXT_STEP':
       return { ...state, currentStep: Math.min(state.currentStep + 1, 2) };
     case 'PREVIOUS_STEP':
@@ -74,6 +98,10 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
       closeWizard: () => dispatch({ type: 'CLOSE_WIZARD' }),
       setCountry: (country) => dispatch({ type: 'SET_COUNTRY', payload: country }),
       setEducationSystem: (system) => dispatch({ type: 'SET_EDUCATION_SYSTEM', payload: system }),
+      setOtherEducationSystemName: (name) => dispatch({ type: 'SET_OTHER_EDUCATION_SYSTEM_NAME', payload: name }),
+      setCustomGradingScale: (scale) => dispatch({ type: 'SET_CUSTOM_GRADING_SCALE', payload: scale }),
+      setCustomSubjects: (subjects) => dispatch({ type: 'SET_CUSTOM_SUBJECTS', payload: subjects }),
+      setCustomGrades: (grades) => dispatch({ type: 'SET_CUSTOM_GRADES', payload: grades }),
       nextStep: () => dispatch({ type: 'NEXT_STEP' }),
       previousStep: () => dispatch({ type: 'PREVIOUS_STEP' }),
       resetJourney: () => dispatch({ type: 'RESET_JOURNEY' }),
