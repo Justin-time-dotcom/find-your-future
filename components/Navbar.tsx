@@ -12,13 +12,13 @@ export function Navbar() {
           Find Your Future
         </Link>
         <nav aria-label="Primary" className="flex items-center gap-4 text-sm font-medium text-slate-300">
-          <Link href="#hero" className="transition hover:text-white">
+          <Link href="#hero" scroll className="transition hover:text-white">
             Home
           </Link>
-          <Link href="#features" className="transition hover:text-white">
+          <Link href="#features" scroll className="transition hover:text-white">
             Features
           </Link>
-          <Link href="#cta" className="transition hover:text-white">
+          <Link href="#cta" scroll className="transition hover:text-white">
             Get Started
           </Link>
         </nav>

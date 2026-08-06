@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { motion, useInView } from 'framer-motion';
 
 const metrics = [
   { value: 1000, suffix: '+', label: 'Universities' },
@@ -34,16 +35,45 @@ function useCountUp(target: number, duration = 1200) {
 }
 
 function AnimatedMetric({ value, suffix, label }: { value: number; suffix: string; label: string }) {
-  const count = useCountUp(value);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const [count, setCount] = useState(0);
+  const ref = useInView({ threshold: 0.4, triggerOnce: true });
+
+  useEffect(() => {
+    if (!ref[1]) return;
+
+    setHasAnimated(true);
+    let startTime: number | null = null;
+    let frame = 0;
+
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / 1200, 1);
+      setCount(Math.floor(progress * value));
+
+      if (progress < 1) {
+        frame = window.requestAnimationFrame(step);
+      }
+    };
+
+    frame = window.requestAnimationFrame(step);
+    return () => window.cancelAnimationFrame(frame);
+  }, [ref[1], value]);
 
   return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/50 p-6 text-center">
+    <motion.div
+      ref={ref[0]}
+      initial={{ opacity: 0, y: 16 }}
+      animate={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+      transition={{ duration: 0.45 }}
+      className="rounded-[1.5rem] border border-white/10 bg-slate-950/50 p-6 text-center"
+    >
       <p className="text-4xl font-semibold text-white sm:text-5xl">
         {count.toLocaleString()}
         {suffix}
       </p>
       <p className="mt-3 text-sm uppercase tracking-[0.25em] text-slate-400">{label}</p>
-    </div>
+    </motion.div>
   );
 }
 

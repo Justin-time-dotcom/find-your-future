@@ -4,7 +4,9 @@ import { CallToAction } from '../components/CallToAction';
 import { FeatureCard } from '../components/FeatureCard';
 import { Hero } from '../components/Hero';
 import { HowItWorks } from '../components/HowItWorks';
+import { JourneyWizard } from '../components/JourneyWizard';
 import { Stats } from '../components/Stats';
+import { useJourney } from '../components/JourneyContext';
 
 const features = [
   {
@@ -56,6 +58,8 @@ const features = [
 ];
 
 export default function HomePage() {
+  const { isWizardOpen } = useJourney();
+
   return (
     <main className="space-y-8 pb-8 sm:space-y-10 lg:space-y-12">
       <Hero />
@@ -81,6 +85,8 @@ export default function HomePage() {
       <HowItWorks />
       <Stats />
       <CallToAction />
+
+      {isWizardOpen && <JourneyWizard />}
     </main>
   );
 }

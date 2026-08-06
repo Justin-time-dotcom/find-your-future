@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "../styles/globals.css";
 
-import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
+import { JourneyProvider } from "../components/JourneyContext";
+import { Navbar } from "../components/Navbar";
 
 export const metadata: Metadata = {
   title: {
@@ -32,15 +33,17 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen bg-slate-950 text-slate-100">
         <div className="flex min-h-screen flex-col">
-          <Navbar />
+          <JourneyProvider>
+            <Navbar />
 
-          <main className="flex-1">
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-              {children}
-            </div>
-          </main>
+            <main className="flex-1">
+              <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                {children}
+              </div>
+            </main>
 
-          <Footer />
+            <Footer />
+          </JourneyProvider>
         </div>
       </body>
     </html>
