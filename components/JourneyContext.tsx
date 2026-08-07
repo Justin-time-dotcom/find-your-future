@@ -74,7 +74,7 @@ function journeyReducer(state: JourneyState, action: JourneyAction): JourneyStat
     case 'SET_CUSTOM_GRADES':
       return { ...state, customGrades: action.payload };
     case 'NEXT_STEP':
-      return { ...state, currentStep: Math.min(state.currentStep + 1, 2) };
+      return { ...state, currentStep: Math.min(state.currentStep + 1, 3) };
     case 'PREVIOUS_STEP':
       return { ...state, currentStep: Math.max(state.currentStep - 1, 0) };
     case 'RESET_JOURNEY':
