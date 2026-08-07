@@ -1,0 +1,736 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RecordStatus {
+  Draft
+  Active
+  Deprecated
+  Retired
+  Archived
+}
+
+enum SourceType {
+  Government
+  MinistryOfEducation
+  University
+  ExaminationCouncil
+  ScholarshipProvider
+  ProfessionalBody
+  ResearchInstitution
+  InternationalOrganization
+}
+
+model Country {
+  id                   String   @id @default(uuid())
+  slug                 String   @unique
+  isoCode              String   @unique
+  officialName        String
+  shortName           String
+  capital             String?
+  timeZone            String?
+  continent           String?
+  subRegion           String?
+  flag                String?
+  nationality         String?
+  drivingSide         String?
+  educationAuthority  String?
+  currencyId          String?
+  currency            Currency? @relation(fields: [currencyId], references: [id])
+  educationSystems    EducationSystem[]
+  academicCalendars   AcademicCalendar[]
+  qualificationTypes  QualificationType[]
+  countryLanguages    CountryLanguage[]
+  localizedContents   LocalizedContent[]
+  dataSources         DataSource[]
+  verificationRecords VerificationRecord[]
+  changeLogs          ChangeLog[]
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+  version            Int       @default(1)
+  effectiveFrom      DateTime  @default(now())
+  effectiveTo        DateTime?
+  status             RecordStatus @default(Draft)
+  sourceType         SourceType?
+  sourceName         String?
+  sourceOrganization String?
+  sourceUrl          String?
+  documentVersion    String?
+  verified           Boolean   @default(false)
+  verifiedBy         String?
+  verifiedAt         DateTime?
+  reviewDue          DateTime?
+  confidenceScore    Int?
+  notes              String?
+  createdBy          String?
+  updatedBy          String?
+  keywords           String[]
+  tags               String[]
+  aliases            String[]
+  commonAbbreviations String[]
+  seoTitle           String?
+  seoDescription     String?
+  aiSummary          String?
+  embeddingReady     Boolean   @default(false)
+  relatedEntities    String[]
+  semanticKeywords   String[]
+  searchKeywords     String[]
+}
+
+model Language {
+  id                   String   @id @default(uuid())
+  slug                 String   @unique
+  name                 String
+  code                 String   @unique
+  nativeName          String?
+  countryLanguages    CountryLanguage[]
+  localizedContents   LocalizedContent[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  deletedAt           DateTime?
+  version             Int      @default(1)
+  effectiveFrom       DateTime @default(now())
+  effectiveTo         DateTime?
+  status              RecordStatus @default(Active)
+  sourceType          SourceType?
+  sourceName          String?
+  sourceOrganization  String?
+  sourceUrl           String?
+  documentVersion     String?
+  verified            Boolean  @default(false)
+  verifiedBy          String?
+  verifiedAt          DateTime?
+  reviewDue           DateTime?
+  confidenceScore     Int?
+  notes               String?
+  createdBy           String?
+  updatedBy           String?
+  keywords            String[]
+  tags                String[]
+  aliases             String[]
+  commonAbbreviations String[]
+  seoTitle            String?
+  seoDescription      String?
+  aiSummary           String?
+  embeddingReady      Boolean  @default(false)
+  relatedEntities     String[]
+  semanticKeywords    String[]
+  searchKeywords      String[]
+}
+
+model Currency {
+  id                   String   @id @default(uuid())
+  slug                 String   @unique
+  code                 String   @unique
+  name                 String
+  symbol               String?
+  countries            Country[]
+  localizedContents   LocalizedContent[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  deletedAt           DateTime?
+  version             Int      @default(1)
+  effectiveFrom       DateTime @default(now())
+  effectiveTo         DateTime?
+  status              RecordStatus @default(Active)
+  sourceType          SourceType?
+  sourceName          String?
+  sourceOrganization  String?
+  sourceUrl           String?
+  documentVersion     String?
+  verified            Boolean  @default(false)
+  verifiedBy          String?
+  verifiedAt          DateTime?
+  reviewDue           DateTime?
+  confidenceScore     Int?
+  notes               String?
+  createdBy           String?
+  updatedBy           String?
+  keywords            String[]
+  tags                String[]
+  aliases             String[]
+  commonAbbreviations String[]
+  seoTitle            String?
+  seoDescription      String?
+  aiSummary           String?
+  embeddingReady      Boolean  @default(false)
+  relatedEntities     String[]
+  semanticKeywords    String[]
+  searchKeywords      String[]
+}
+
+model CountryLanguage {
+  id           String   @id @default(uuid())
+  countryId    String
+  languageId   String
+  country      Country  @relation(fields: [countryId], references: [id])
+  language     Language @relation(fields: [languageId], references: [id])
+  official     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime?
+  version      Int      @default(1)
+  effectiveFrom DateTime @default(now())
+  effectiveTo   DateTime?
+  status       RecordStatus @default(Active)
+  createdBy    String?
+  updatedBy    String?
+
+  @@unique([countryId, languageId])
+}
+
+model EducationLevel {
+  id                   String   @id @default(uuid())
+  slug                 String   @unique
+  name                 String
+  shortName            String?
+  description          String?
+  parentLevelId        String?
+  parentLevel          EducationLevel?  @relation("EducationLevelHierarchy", fields: [parentLevelId], references: [id])
+  childLevels          EducationLevel[] @relation("EducationLevelHierarchy")
+  localizedContents    LocalizedContent[]
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  deletedAt            DateTime?
+  version              Int      @default(1)
+  effectiveFrom        DateTime @default(now())
+  effectiveTo          DateTime?
+  status               RecordStatus @default(Active)
+  sourceType           SourceType?
+  sourceName           String?
+  sourceOrganization   String?
+  sourceUrl            String?
+  documentVersion      String?
+  verified             Boolean  @default(false)
+  verifiedBy           String?
+  verifiedAt           DateTime?
+  reviewDue            DateTime?
+  confidenceScore      Int?
+  notes                String?
+  createdBy            String?
+  updatedBy            String?
+  keywords             String[]
+  tags                 String[]
+  aliases              String[]
+  commonAbbreviations  String[]
+  seoTitle             String?
+  seoDescription       String?
+  aiSummary            String?
+  embeddingReady       Boolean  @default(false)
+  relatedEntities      String[]
+  semanticKeywords     String[]
+  searchKeywords       String[]
+}
+
+model SubjectGroup {
+  id                   String   @id @default(uuid())
+  slug                 String   @unique
+  name                 String
+  description          String?
+  subjects             Subject[]
+  localizedContents    LocalizedContent[]
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  deletedAt            DateTime?
+  version              Int      @default(1)
+  effectiveFrom        DateTime @default(now())
+  effectiveTo          DateTime?
+  status               RecordStatus @default(Active)
+  sourceType           SourceType?
+  sourceName           String?
+  sourceOrganization   String?
+  sourceUrl            String?
+  documentVersion      String?
+  verified             Boolean  @default(false)
+  verifiedBy           String?
+  verifiedAt           DateTime?
+  reviewDue            DateTime?
+  confidenceScore      Int?
+  notes                String?
+  createdBy            String?
+  updatedBy            String?
+  keywords             String[]
+  tags                 String[]
+  aliases              String[]
+  commonAbbreviations  String[]
+  seoTitle             String?
+  seoDescription       String?
+  aiSummary            String?
+  embeddingReady       Boolean  @default(false)
+  relatedEntities      String[]
+  semanticKeywords     String[]
+  searchKeywords       String[]
+}
+
+model Subject {
+  id                   String   @id @default(uuid())
+  slug                 String   @unique
+  name                 String
+  code                 String   @unique
+  subjectGroupId       String
+  subjectGroup         SubjectGroup @relation(fields: [subjectGroupId], references: [id])
+  description          String?
+  difficultyIndex      Float?
+  relatedSubjects      String[]
+  careerRelevance      Int?
+  universityRelevance  Int?
+  educationSystemSubjects EducationSystemSubject[]
+  localizedContents    LocalizedContent[]
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  deletedAt            DateTime?
+  version              Int      @default(1)
+  effectiveFrom        DateTime @default(now())
+  effectiveTo          DateTime?
+  status               RecordStatus @default(Active)
+  sourceType           SourceType?
+  sourceName           String?
+  sourceOrganization   String?
+  sourceUrl            String?
+  documentVersion      String?
+  verified             Boolean  @default(false)
+  verifiedBy           String?
+  verifiedAt           DateTime?
+  reviewDue            DateTime?
+  confidenceScore      Int?
+  notes                String?
+  createdBy            String?
+  updatedBy            String?
+  keywords             String[]
+  tags                 String[]
+  aliases              String[]
+  commonAbbreviations  String[]
+  seoTitle             String?
+  seoDescription       String?
+  aiSummary            String?
+  embeddingReady       Boolean  @default(false)
+  relatedEntities      String[]
+  semanticKeywords     String[]
+  searchKeywords       String[]
+}
+
+model EducationSystem {
+  id                     String   @id @default(uuid())
+  slug                   String   @unique
+  countryId              String
+  country                Country  @relation(fields: [countryId], references: [id])
+  name                   String
+  shortName              String?
+  qualificationLevel     String?
+  minimumSubjects        Int?
+  maximumSubjects        Int?
+  compulsorySubjects     String[]
+  optionalSubjectGroups  String[]
+  schoolStructure        String?
+  assessmentType         String?
+  educationSystemSubjects EducationSystemSubject[]
+  gradingSystems         GradingSystem[]
+  academicCalendars      AcademicCalendar[]
+  qualificationTypes     QualificationType[]
+  localizedContents      LocalizedContent[]
+  dataSources            DataSource[]
+  verificationRecords    VerificationRecord[]
+  changeLogs             ChangeLog[]
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  deletedAt              DateTime?
+  version                Int      @default(1)
+  effectiveFrom          DateTime @default(now())
+  effectiveTo            DateTime?
+  status                 RecordStatus @default(Draft)
+  sourceType             SourceType?
+  sourceName             String?
+  sourceOrganization     String?
+  sourceUrl              String?
+  documentVersion        String?
+  verified               Boolean  @default(false)
+  verifiedBy             String?
+  verifiedAt             DateTime?
+  reviewDue              DateTime?
+  confidenceScore        Int?
+  notes                  String?
+  createdBy              String?
+  updatedBy              String?
+  keywords               String[]
+  tags                   String[]
+  aliases                String[]
+  commonAbbreviations    String[]
+  seoTitle               String?
+  seoDescription         String?
+  aiSummary              String?
+  embeddingReady         Boolean  @default(false)
+  relatedEntities        String[]
+  semanticKeywords       String[]
+  searchKeywords        String[]
+}
+
+model EducationSystemSubject {
+  id                  String   @id @default(uuid())
+  educationSystemId   String
+  educationSystem     EducationSystem @relation(fields: [educationSystemId], references: [id])
+  subjectId           String
+  subject             Subject @relation(fields: [subjectId], references: [id])
+  required            Boolean  @default(false)
+  optional            Boolean  @default(false)
+  minimumGrade        String?
+  maximumGrade        String?
+  displayOrder        Int?
+  validationRules     String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  deletedAt           DateTime?
+  version             Int      @default(1)
+  effectiveFrom       DateTime @default(now())
+  effectiveTo         DateTime?
+  status              RecordStatus @default(Active)
+  createdBy           String?
+  updatedBy           String?
+
+  @@unique([educationSystemId, subjectId])
+}
+
+model GradingSystem {
+  id                 String   @id @default(uuid())
+  slug               String   @unique
+  educationSystemId  String
+  educationSystem    EducationSystem @relation(fields: [educationSystemId], references: [id])
+  name               String
+  description        String?
+  grades             Grade[]
+  localizedContents  LocalizedContent[]
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  deletedAt          DateTime?
+  version            Int      @default(1)
+  effectiveFrom      DateTime @default(now())
+  effectiveTo        DateTime?
+  status             RecordStatus @default(Active)
+  sourceType         SourceType?
+  sourceName         String?
+  sourceOrganization String?
+  sourceUrl          String?
+  documentVersion    String?
+  verified           Boolean  @default(false)
+  verifiedBy         String?
+  verifiedAt         DateTime?
+  reviewDue          DateTime?
+  confidenceScore    Int?
+  notes              String?
+  createdBy          String?
+  updatedBy          String?
+  keywords           String[]
+  tags               String[]
+  aliases            String[]
+  commonAbbreviations String[]
+  seoTitle           String?
+  seoDescription     String?
+  aiSummary          String?
+  embeddingReady     Boolean  @default(false)
+  relatedEntities    String[]
+  semanticKeywords   String[]
+  searchKeywords     String[]
+}
+
+model Grade {
+  id                 String   @id @default(uuid())
+  slug               String   @unique
+  gradingSystemId    String
+  gradingSystem      GradingSystem @relation(fields: [gradingSystemId], references: [id])
+  label              String
+  value              String
+  rank               Int?
+  description        String?
+  localizedContents  LocalizedContent[]
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  deletedAt          DateTime?
+  version            Int      @default(1)
+  effectiveFrom      DateTime @default(now())
+  effectiveTo        DateTime?
+  status             RecordStatus @default(Active)
+  sourceType         SourceType?
+  sourceName         String?
+  sourceOrganization String?
+  sourceUrl          String?
+  documentVersion    String?
+  verified           Boolean  @default(false)
+  verifiedBy         String?
+  verifiedAt         DateTime?
+  reviewDue          DateTime?
+  confidenceScore    Int?
+  notes              String?
+  createdBy          String?
+  updatedBy          String?
+  keywords           String[]
+  tags               String[]
+  aliases            String[]
+  commonAbbreviations String[]
+  seoTitle           String?
+  seoDescription     String?
+  aiSummary          String?
+  embeddingReady     Boolean  @default(false)
+  relatedEntities    String[]
+  semanticKeywords   String[]
+  searchKeywords     String[]
+}
+
+model GradeEquivalency {
+  id                  String   @id @default(uuid())
+  slug                String   @unique
+  fromGrade           String
+  fromScale           String
+  toGrade             String
+  toScale             String
+  confidence          Int?
+  source              String?
+  localizedContents   LocalizedContent[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  deletedAt           DateTime?
+  version             Int      @default(1)
+  effectiveFrom       DateTime @default(now())
+  effectiveTo         DateTime?
+  status              RecordStatus @default(Active)
+  sourceType          SourceType?
+  sourceName          String?
+  sourceOrganization  String?
+  sourceUrl           String?
+  documentVersion     String?
+  verified            Boolean  @default(false)
+  verifiedBy          String?
+  verifiedAt          DateTime?
+  reviewDue           DateTime?
+  confidenceScore     Int?
+  notes               String?
+  createdBy           String?
+  updatedBy           String?
+  keywords            String[]
+  tags                String[]
+  aliases             String[]
+  commonAbbreviations String[]
+  seoTitle            String?
+  seoDescription      String?
+  aiSummary           String?
+  embeddingReady      Boolean  @default(false)
+  relatedEntities     String[]
+  semanticKeywords    String[]
+  searchKeywords      String[]
+}
+
+model AcademicCalendar {
+  id                   String   @id @default(uuid())
+  slug                 String   @unique
+  countryId            String
+  country              Country  @relation(fields: [countryId], references: [id])
+  educationSystemId    String?
+  educationSystem      EducationSystem? @relation(fields: [educationSystemId], references: [id])
+  name                 String
+  startMonth          Int?
+  endMonth            Int?
+  description         String?
+  localizedContents   LocalizedContent[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  deletedAt           DateTime?
+  version             Int      @default(1)
+  effectiveFrom       DateTime @default(now())
+  effectiveTo         DateTime?
+  status              RecordStatus @default(Active)
+  sourceType          SourceType?
+  sourceName          String?
+  sourceOrganization  String?
+  sourceUrl           String?
+  documentVersion     String?
+  verified            Boolean  @default(false)
+  verifiedBy          String?
+  verifiedAt          DateTime?
+  reviewDue           DateTime?
+  confidenceScore     Int?
+  notes               String?
+  createdBy           String?
+  updatedBy           String?
+  keywords            String[]
+  tags                String[]
+  aliases             String[]
+  commonAbbreviations String[]
+  seoTitle            String?
+  seoDescription      String?
+  aiSummary           String?
+  embeddingReady      Boolean  @default(false)
+  relatedEntities     String[]
+  semanticKeywords    String[]
+  searchKeywords      String[]
+}
+
+model QualificationType {
+  id                   String   @id @default(uuid())
+  slug                 String   @unique
+  countryId            String
+  country              Country  @relation(fields: [countryId], references: [id])
+  educationSystemId    String?
+  educationSystem      EducationSystem? @relation(fields: [educationSystemId], references: [id])
+  name                 String
+  description          String?
+  localizedContents    LocalizedContent[]
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  deletedAt            DateTime?
+  version              Int      @default(1)
+  effectiveFrom        DateTime @default(now())
+  effectiveTo          DateTime?
+  status               RecordStatus @default(Active)
+  sourceType           SourceType?
+  sourceName           String?
+  sourceOrganization   String?
+  sourceUrl            String?
+  documentVersion      String?
+  verified             Boolean  @default(false)
+  verifiedBy           String?
+  verifiedAt           DateTime?
+  reviewDue            DateTime?
+  confidenceScore      Int?
+  notes                String?
+  createdBy            String?
+  updatedBy            String?
+  keywords             String[]
+  tags                 String[]
+  aliases              String[]
+  commonAbbreviations  String[]
+  seoTitle             String?
+  seoDescription       String?
+  aiSummary            String?
+  embeddingReady       Boolean  @default(false)
+  relatedEntities      String[]
+  semanticKeywords     String[]
+  searchKeywords       String[]
+}
+
+model DataSource {
+  id                   String   @id @default(uuid())
+  slug                 String   @unique
+  entityType           String
+  entityId             String
+  countryId            String?
+  country              Country?  @relation(fields: [countryId], references: [id])
+  educationSystemId    String?
+  educationSystem      EducationSystem? @relation(fields: [educationSystemId], references: [id])
+  sourceType           SourceType
+  sourceName           String
+  sourceOrganization   String?
+  sourceUrl            String?
+  documentVersion      String?
+  verified             Boolean  @default(false)
+  verifiedBy           String?
+  verifiedAt           DateTime?
+  reviewDue            DateTime?
+  confidenceScore      Int?
+  notes                String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  deletedAt            DateTime?
+  version              Int      @default(1)
+  effectiveFrom        DateTime @default(now())
+  effectiveTo          DateTime?
+  status               RecordStatus @default(Active)
+  createdBy            String?
+  updatedBy            String?
+}
+
+model VerificationRecord {
+  id                   String   @id @default(uuid())
+  entityType           String
+  entityId             String
+  countryId            String?
+  country              Country?  @relation(fields: [countryId], references: [id])
+  educationSystemId    String?
+  educationSystem      EducationSystem? @relation(fields: [educationSystemId], references: [id])
+  verified             Boolean  @default(false)
+  verifiedBy           String?
+  verifiedAt           DateTime?
+  reviewDue            DateTime?
+  confidenceScore      Int?
+  notes                String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  deletedAt            DateTime?
+  version              Int      @default(1)
+  effectiveFrom        DateTime @default(now())
+  effectiveTo          DateTime?
+  status               RecordStatus @default(Active)
+  createdBy            String?
+  updatedBy            String?
+}
+
+model ChangeLog {
+  id                   String   @id @default(uuid())
+  entityType           String
+  entityId             String
+  oldVersion           String?
+  newVersion           String?
+  reason               String?
+  source               String?
+  date                 DateTime @default(now())
+  author               String?
+  countryId            String?
+  country              Country?  @relation(fields: [countryId], references: [id])
+  educationSystemId    String?
+  educationSystem      EducationSystem? @relation(fields: [educationSystemId], references: [id])
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  deletedAt            DateTime?
+  version              Int      @default(1)
+  effectiveFrom        DateTime @default(now())
+  effectiveTo          DateTime?
+  status               RecordStatus @default(Active)
+  createdBy            String?
+  updatedBy            String?
+}
+
+model LocalizedContent {
+  id             String   @id @default(uuid())
+  entityType     String
+  entityId       String
+  fieldName      String
+  languageCode   String
+  value          String
+  countryId      String?
+  country        Country?  @relation(fields: [countryId], references: [id])
+  educationLevelId String?
+  educationLevel EducationLevel? @relation(fields: [educationLevelId], references: [id])
+  subjectGroupId String?
+  subjectGroup   SubjectGroup? @relation(fields: [subjectGroupId], references: [id])
+  subjectId      String?
+  subject        Subject? @relation(fields: [subjectId], references: [id])
+  educationSystemId String?
+  educationSystem EducationSystem? @relation(fields: [educationSystemId], references: [id])
+  gradingSystemId String?
+  gradingSystem  GradingSystem? @relation(fields: [gradingSystemId], references: [id])
+  gradeId        String?
+  grade          Grade? @relation(fields: [gradeId], references: [id])
+  equivalencyId  String?
+  equivalency    GradeEquivalency? @relation(fields: [equivalencyId], references: [id])
+  academicCalendarId String?
+  academicCalendar AcademicCalendar? @relation(fields: [academicCalendarId], references: [id])
+  qualificationTypeId String?
+  qualificationType QualificationType? @relation(fields: [qualificationTypeId], references: [id])
+  languageId     String?
+  language       Language? @relation(fields: [languageId], references: [id])
+  currencyId     String?
+  currency       Currency? @relation(fields: [currencyId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  deletedAt      DateTime?
+  version        Int      @default(1)
+  effectiveFrom  DateTime @default(now())
+  effectiveTo    DateTime?
+  status         RecordStatus @default(Active)
+  createdBy      String?
+  updatedBy      String?
+}
